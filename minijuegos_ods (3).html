@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minijuegos por los ODS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0a0a12;color:#f0eee8;min-height:100vh}
+.hero{background:#0a0a12;padding:3rem 2rem 2rem;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.08)}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,rgba(90,200,120,0.15) 0%,transparent 70%);pointer-events:none}
+.badge{display:inline-block;background:rgba(90,200,120,0.15);color:#5dc878;border:1px solid rgba(90,200,120,0.35);border-radius:20px;padding:5px 16px;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.2rem}
+h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.1;margin-bottom:1rem;background:linear-gradient(135deg,#ffffff 30%,#5dc878 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:1.1rem;color:rgba(240,238,232,0.6);max-width:560px;margin:0 auto 2rem;line-height:1.6}
+.ods-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:1rem}
+.ods-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid}
+.pill-4{background:rgba(196,128,0,0.15);color:#f0a500;border-color:rgba(196,128,0,0.3)}
+.pill-10{background:rgba(220,20,100,0.12);color:#e8558a;border-color:rgba(220,20,100,0.3)}
+.pill-12{background:rgba(90,150,200,0.12);color:#72aadd;border-color:rgba(90,150,200,0.3)}
+nav{background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);padding:0.8rem 1rem}
+.nav-hint{text-align:center;font-size:11px;color:rgba(240,238,232,0.35);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.6rem}
+.nav-steps{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.nav-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(240,238,232,0.65);border-radius:10px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:72px;padding:8px 10px 7px}
+.nav-btn:hover{background:rgba(90,200,120,0.1);border-color:rgba(90,200,120,0.4);color:#5dc878;transform:translateY(-1px)}
+.nav-btn.active{background:rgba(90,200,120,0.18);border-color:#5dc878;color:#5dc878}
+.nav-btn .nav-icon{font-size:1.3rem;line-height:1}
+.nav-btn .nav-label{font-size:10px;font-weight:500;line-height:1.2;text-align:center;max-width:64px}
+.nav-btn .nav-arrow{font-size:9px;color:rgba(90,200,120,0.6);margin-top:1px}
+.nav-btn.active .nav-arrow{color:#5dc878}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem 4rem}
+section{display:none}
+section.visible{display:block}
+.section-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:700;margin-bottom:0.4rem;color:#fff}
+.section-lead{font-size:1rem;color:rgba(240,238,232,0.55);margin-bottom:2rem;line-height:1.6}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09);border-radius:14px;padding:1.5rem;margin-bottom:1.2rem}
+.card-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:0.5rem;display:flex;align-items:center;gap:10px}
+.card-body{font-size:0.92rem;color:rgba(240,238,232,0.65);line-height:1.7}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:rgba(90,200,120,0.2);border:1px solid rgba(90,200,120,0.4);border-radius:50%;font-size:12px;font-weight:700;color:#5dc878;flex-shrink:0}
+.highlight-box{background:rgba(90,200,120,0.07);border:1px solid rgba(90,200,120,0.25);border-left:3px solid #5dc878;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1rem 0;font-size:0.9rem;color:rgba(240,238,232,0.8);line-height:1.7}
+.warn-box{background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.25);border-left:3px solid #f0a500;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1rem 0;font-size:0.9rem;color:rgba(240,238,232,0.8);line-height:1.7}
+.info-box{background:rgba(114,170,221,0.07);border:1px solid rgba(114,170,221,0.25);border-left:3px solid #72aadd;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1rem 0;font-size:0.9rem;color:rgba(240,238,232,0.8);line-height:1.7}
+.danger-box{background:rgba(224,75,74,0.07);border:1px solid rgba(224,75,74,0.25);border-left:3px solid #e04b4a;border-radius:0 8px 8px 0;padding:1rem 1.2rem;margin:1rem 0;font-size:0.9rem;color:rgba(240,238,232,0.8);line-height:1.7}
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:1rem 0}
+.role-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.1rem;text-align:center}
+.role-icon{font-size:2rem;margin-bottom:0.5rem;display:block}
+.role-name{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:0.3rem}
+.role-desc{font-size:0.8rem;color:rgba(240,238,232,0.5);line-height:1.5}
+.ods-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:1rem 0}
+.ods-card{border-radius:10px;padding:1rem;text-align:center;cursor:pointer;transition:all 0.15s;border:1px solid transparent;position:relative}
+.ods-card:hover{transform:scale(1.05)}
+.ods-card::after{content:'↗';position:absolute;top:6px;right:8px;font-size:10px;opacity:0.5}
+.ods-card .ods-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;display:block;margin-bottom:0.2rem}
+.ods-card .ods-lbl{font-size:0.75rem;font-weight:500;line-height:1.3}
+pre{background:#0d1117;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:1.2rem;overflow-x:auto;font-size:0.82rem;line-height:1.6;font-family:'Courier New',monospace;color:#cdd9e5;margin:0.8rem 0}
+.kw{color:#ff7b72}.fn{color:#d2a8ff}.str{color:#a5d6ff}.cm{color:#5c6e82;font-style:italic}.num{color:#79c0ff}.var{color:#ffa657}
+.hl{background:rgba(90,200,120,0.12);border-left:3px solid #5dc878;display:block;margin-left:-1.2rem;padding-left:calc(1.2rem - 3px)}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.9rem;color:rgba(240,238,232,0.75);line-height:1.5}
+.checklist li:last-child{border-bottom:none}
+.check{width:18px;height:18px;border:1.5px solid rgba(90,200,120,0.5);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
+.check.done{background:#5dc878;border-color:#5dc878;color:#0a0a12;font-size:11px;font-weight:700}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.1);flex-wrap:wrap}
+.tab{padding:8px 16px;background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(240,238,232,0.5);font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;margin-bottom:-1px}
+.tab.active{color:#5dc878;border-bottom-color:#5dc878}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.question-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.2rem;margin-bottom:0.8rem}
+.q-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(90,200,120,0.8);font-weight:600;margin-bottom:0.5rem}
+.q-text{font-size:0.95rem;color:#fff;font-weight:500;margin-bottom:0.8rem}
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.q-opt{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;font-size:0.82rem;color:rgba(240,238,232,0.7)}
+.q-opt.correct{background:rgba(90,200,120,0.1);border-color:rgba(90,200,120,0.4);color:#5dc878}
+.q-opt.wrong{background:rgba(224,75,74,0.1);border-color:rgba(224,75,74,0.3);color:#e04b4a;text-decoration:line-through}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:1rem 0}
+.big-link{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1rem 1.2rem;text-decoration:none;color:inherit;transition:all 0.2s;margin-bottom:8px}
+.big-link:hover{background:rgba(90,200,120,0.07);border-color:rgba(90,200,120,0.3)}
+.big-link-icon{width:40px;height:40px;background:rgba(255,255,255,0.07);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.big-link-text .lbl{font-size:0.95rem;font-weight:500;color:#fff}
+.big-link-text .sub{font-size:0.8rem;color:rgba(240,238,232,0.5);margin-top:2px}
+.arrow{margin-left:auto;color:rgba(255,255,255,0.3)}
+code{background:rgba(255,255,255,0.1);padding:1px 6px;border-radius:4px;font-family:'Courier New',monospace;font-size:0.85em}
+p{margin-bottom:0.8rem}
+.steps-visual{display:flex;flex-direction:column;gap:0}
+.step-row{display:flex;gap:16px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.step-row:last-child{border-bottom:none}
+.step-circle{width:32px;height:32px;border-radius:50%;background:rgba(90,200,120,0.15);border:1.5px solid rgba(90,200,120,0.5);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:#5dc878;flex-shrink:0;margin-top:2px}
+.step-content .step-title{font-size:0.95rem;font-weight:500;color:#fff;margin-bottom:4px}
+.step-content .step-desc{font-size:0.85rem;color:rgba(240,238,232,0.6);line-height:1.6}
+.folder-diagram{background:#0d1117;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:1.2rem 1.5rem;font-family:'Courier New',monospace;font-size:0.85rem;line-height:2;color:#cdd9e5;margin:0.8rem 0}
+.f-folder{color:#ffa657}.f-file{color:#a5d6ff}.f-ok{color:#5dc878;font-size:0.75rem;margin-left:8px}
+.insert-block{border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;margin-bottom:1.2rem}
+.insert-header{background:rgba(255,255,255,0.05);padding:0.8rem 1.2rem;display:flex;align-items:center;gap:10px}
+.insert-header .tag{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;padding:3px 10px;border-radius:10px}
+.tag-donde{background:rgba(114,170,221,0.15);color:#72aadd;border:1px solid rgba(114,170,221,0.3)}
+.tag-notocar{background:rgba(224,75,74,0.12);color:#e04b4a;border:1px solid rgba(224,75,74,0.25)}
+.insert-label{font-size:0.9rem;color:#fff;font-weight:500}
+.insert-body{padding:0 1.2rem 1.2rem}
+.os-tabs{display:flex;gap:8px;margin-bottom:1rem}
+.os-tab{padding:7px 18px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(240,238,232,0.6);font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s}
+.os-tab.active{background:rgba(90,200,120,0.15);border-color:rgba(90,200,120,0.4);color:#5dc878}
+.os-panel{display:none}.os-panel.active{display:block}
+.rubrica-wrap{border:1px solid rgba(255,255,255,0.09);border-radius:12px;overflow:hidden;margin:1rem 0}
+.rubrica-header{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1fr 1fr;gap:0}
+.rubrica-header div{padding:10px 10px;font-size:0.74rem;font-weight:600;text-align:center;text-transform:uppercase;letter-spacing:0.05em}
+.rh-criterio{background:rgba(255,255,255,0.07);color:rgba(240,238,232,0.7);text-align:left!important}
+.rh-exc{background:rgba(90,200,120,0.22);color:#5dc878}
+.rh-not{background:rgba(90,200,120,0.13);color:#7dd69a}
+.rh-bie{background:rgba(240,165,0,0.15);color:#f0a500}
+.rh-suf{background:rgba(114,170,221,0.15);color:#72aadd}
+.rh-ins{background:rgba(224,75,74,0.15);color:#e04b4a}
+.rubrica-row{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr 1fr 1fr;gap:0;border-top:1px solid rgba(255,255,255,0.06)}
+.rubrica-row div{padding:11px 10px;font-size:0.78rem;line-height:1.5}
+.rc-criterio{color:#fff;font-weight:500;background:rgba(255,255,255,0.03);border-right:1px solid rgba(255,255,255,0.06)}
+.rc-exc{color:rgba(240,238,232,0.85);background:rgba(90,200,120,0.05)}
+.rc-not{color:rgba(240,238,232,0.8);background:rgba(90,200,120,0.03)}
+.rc-bie{color:rgba(240,238,232,0.75);background:rgba(240,165,0,0.04)}
+.rc-suf{color:rgba(240,238,232,0.7);background:rgba(114,170,221,0.04)}
+.rc-ins{color:rgba(240,238,232,0.65);background:rgba(224,75,74,0.04)}
+.puntuacion-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:1rem 0}
+.punt-card{border-radius:10px;padding:0.8rem;text-align:center;border:1px solid}
+.punt-num{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800}
+.punt-lbl{font-size:0.72rem;margin-top:2px}
+.pe{background:rgba(90,200,120,0.1);border-color:rgba(90,200,120,0.3);color:#5dc878}
+.pn{background:rgba(90,200,120,0.06);border-color:rgba(90,200,120,0.2);color:#7dd69a}
+.pb{background:rgba(240,165,0,0.08);border-color:rgba(240,165,0,0.25);color:#f0a500}
+.ps{background:rgba(114,170,221,0.08);border-color:rgba(114,170,221,0.25);color:#72aadd}
+.pi{background:rgba(224,75,74,0.08);border-color:rgba(224,75,74,0.2);color:#e04b4a}
+.cotejo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:1rem 0}
+.cotejo-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.2rem}
+.cotejo-title{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:0.8rem;display:flex;align-items:center;gap:8px}
+.cotejo-sub{font-size:0.78rem;color:rgba(240,238,232,0.45);margin-bottom:0.8rem;line-height:1.4}
+@media(max-width:700px){
+  .rubrica-header,.rubrica-row{grid-template-columns:1fr}
+  .rubrica-header div:not(.rh-criterio){display:none}
+  .rubrica-row div:not(.rc-criterio){padding:5px 10px;font-size:0.75rem}
+  .cotejo-grid,.two-col,.q-options,.puntuacion-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="badge">Python + Pygame · ODS · Proyecto Cooperativo</div>
+  <h1>Minijuegos por los ODS</h1>
+  <p class="hero-sub">Crea un quiz interactivo en Python que enseñe sobre los Objetivos de Desarrollo Sostenible. Diseño propio, sonido, imágenes y código real.</p>
+  <div class="ods-pills">
+    <span class="ods-pill pill-4">ODS 4 · Educación de calidad</span>
+    <span class="ods-pill pill-10">ODS 10 · Reducción de desigualdades</span>
+    <span class="ods-pill pill-12">ODS 12 · Consumo responsable</span>
+  </div>
+</div>
+<nav>
+  <div class="nav-hint">↓ Haz clic en cada paso para acceder</div>
+  <div class="nav-steps">
+    <button class="nav-btn active" onclick="show('s1',this)"><span class="nav-icon">🚀</span><span class="nav-label">El reto</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s2',this)"><span class="nav-icon">🌍</span><span class="nav-label">Tu ODS</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s3',this)"><span class="nav-icon">🎨</span><span class="nav-label">Tinkercad</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s4',this)"><span class="nav-icon">🧩</span><span class="nav-label">Preguntas</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s5',this)"><span class="nav-icon">💻</span><span class="nav-label">Programa</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s6',this)"><span class="nav-icon">🖼️</span><span class="nav-label">Imagen y sonido</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s6b',this)"><span class="nav-icon">🎬</span><span class="nav-label">Vídeo en esquina</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s7',this)"><span class="nav-icon">🔊</span><span class="nav-label">Mejoras</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s8',this)"><span class="nav-icon">📦</span><span class="nav-label">Entrega</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s9',this)"><span class="nav-icon">⭐</span><span class="nav-label">Evaluación</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('sej',this)"><span class="nav-icon">🎯</span><span class="nav-label">Ejemplo completo</span><span class="nav-arrow">▼ ver</span></button>
+    <button class="nav-btn" onclick="show('s10',this)"><span class="nav-icon">🎮</span><span class="nav-label">Presenta</span><span class="nav-arrow">▼ ver</span></button>
+  </div>
+</nav>
+<div class="container">
+
+<!-- S1 -->
+<section id="s1" class="visible">
+  <div class="section-title">🚀 El reto</div>
+  <p class="section-lead">Tu equipo va a programar un quiz interactivo en Python con Pygame sobre un ODS. No es solo escribir código: es crear una herramienta educativa real con diseño propio, imagen, sonido e impacto social.</p>
+  <div class="card"><div class="card-title"><span class="step-num">1</span> ¿Qué es un quiz interactivo con Pygame?</div><div class="card-body"><p>Un quiz interactivo es un programa que lanza preguntas al usuario, registra su respuesta y da retroalimentación inmediata. Con Pygame puedes añadir imágenes de fondo, efectos de sonido y animaciones.</p><div class="highlight-box"><strong>Flujo del programa:</strong> Aparece la pregunta con 4 opciones → el usuario pulsa A/B/C/D → suena acierto o error y se muestra si era correcta → siguiente pregunta → pantalla final con puntuación.</div></div></div>
+  <div class="card"><div class="card-title"><span class="step-num">2</span> Roles del equipo</div><div class="card-body"><p>Os organizáis en equipos de 3-4 personas. Cada persona tiene un rol principal, aunque todos colaboráis en todo:</p><div class="roles-grid"><div class="role-card"><span class="role-icon">🎨</span><div class="role-name">Diseñador/a visual</div><div class="role-desc">Imagen de fondo, colores, tipografía, logotipo 3D</div></div><div class="role-card"><span class="role-icon">💻</span><div class="role-name">Programador/a</div><div class="role-desc">Adaptar y personalizar la plantilla de código</div></div><div class="role-card"><span class="role-icon">✍️</span><div class="role-name">Redactor/a</div><div class="role-desc">Preguntas, respuestas y distractores del ODS</div></div><div class="role-card"><span class="role-icon">🎤</span><div class="role-name">Portavoz</div><div class="role-desc">Presentación oral y explicación del proyecto</div></div></div></div></div>
+  <div class="card"><div class="card-title"><span class="step-num">3</span> Producto final</div><div class="card-body"><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div>Quiz programado en Python con Pygame (archivo .py ejecutable)</li><li><div class="check" onclick="toggle(this)"></div>Imagen de fondo propia del quiz</li><li><div class="check" onclick="toggle(this)"></div>Logotipo 3D del ODS creado en Tinkercad (como PNG)</li><li><div class="check" onclick="toggle(this)"></div>Sonidos de acierto y error integrados</li><li><div class="check" onclick="toggle(this)"></div>Mínimo 5 preguntas con 4 opciones cada una</li><li><div class="check" onclick="toggle(this)"></div>Presentación oral del proyecto</li><li><div class="check" onclick="toggle(this)"></div>Archivo .zip entregado en Classroom</li></ul><div class="info-box">Consultad la sección <strong>⭐ Evaluación</strong> para saber exactamente qué se va a valorar y cómo.</div></div></div>
+</section>
+
+<!-- S2 -->
+<section id="s2">
+  <div class="section-title">🌍 Elige tu ODS</div>
+  <p class="section-lead">Cada equipo elige un Objetivo de Desarrollo Sostenible. Haz clic en cualquier ODS de la cuadrícula para ver su descripción.</p>
+  <div class="highlight-box"><strong>¿Qué son los ODS?</strong><br>Los Objetivos de Desarrollo Sostenible son 17 metas globales acordadas por la ONU en 2015 para construir un mundo más justo y sostenible antes de 2030. Tu quiz educará sobre uno de ellos.</div>
+  <p style="font-size:0.85rem;color:rgba(240,238,232,0.45);margin-bottom:0.8rem;">👆 Haz clic en un ODS para ver su descripción</p>
+  <div class="ods-grid" id="odsGrid"></div>
+  <div id="odsDetail" style="display:none;" class="card"><div class="card-title" id="odsDTitle"></div><div class="card-body" id="odsDBody"></div></div>
+  <div class="card" style="margin-top:1.5rem;"><div class="card-title">📋 Guía de investigación para el redactor/a</div><div class="card-body"><ul style="padding-left:1.2rem;line-height:2;"><li>¿Cuál es el problema principal que aborda este ODS?</li><li>¿Qué datos concretos (cifras, porcentajes) lo ilustran?</li><li>¿Cómo afecta a nuestra comarca o región?</li><li>¿Qué acciones concretas propone?</li><li>¿Qué puedes hacer tú como ciudadano/a?</li></ul><div class="info-box">Anotad las fuentes. Serán útiles para la presentación oral.</div><a class="big-link" href="https://www.un.org/sustainabledevelopment/es/objetivos-de-desarrollo-sostenible/" target="_blank"><div class="big-link-icon">🌐</div><div class="big-link-text"><div class="lbl">ODS — Naciones Unidas</div><div class="sub">Información oficial de los 17 objetivos</div></div><span class="arrow">↗</span></a></div></div>
+</section>
+
+<!-- S3 -->
+<section id="s3">
+  <div class="section-title">🎨 Logotipo 3D con Tinkercad</div>
+  <p class="section-lead">Diseñaréis el logotipo de vuestro ODS en 3D con Tinkercad y lo exportaréis como PNG para incluirlo en el quiz.</p>
+  <div class="card"><div class="card-title">¿Qué es Tinkercad?</div><div class="card-body"><p>Tinkercad es una herramienta gratuita de diseño 3D en el navegador, sin instalación. Funciona combinando formas básicas como bloques.</p><div class="warn-box">Necesitáis una cuenta gratuita con vuestro email, o el código de aula que os facilite la profesora.</div><a class="big-link" href="https://www.tinkercad.com/learn/designs" target="_blank"><div class="big-link-icon">📖</div><div class="big-link-text"><div class="lbl">Tutoriales oficiales de Tinkercad</div><div class="sub">Lecciones interactivas paso a paso</div></div><span class="arrow">↗</span></a><a class="big-link" href="https://www.tinkercad.com" target="_blank"><div class="big-link-icon">🔧</div><div class="big-link-text"><div class="lbl">Abrir Tinkercad</div><div class="sub">Diseña directamente en el navegador</div></div><span class="arrow">↗</span></a></div></div>
+  <div class="card"><div class="card-title">Pasos para crear y exportar el logotipo</div><div class="card-body"><div class="steps-visual"><div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Crea un nuevo diseño en Tinkercad</div><div class="step-desc">Inicia sesión → "Crear nuevo diseño" → se abre el editor 3D.</div></div></div><div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Diseña con formas básicas</div><div class="step-desc">Panel derecho: arrastra cilindros, cubos, texto 3D… Combínalos para representar tu ODS. Añade el número con texto 3D.</div></div></div><div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Colorea con los colores oficiales del ODS</div><div class="step-desc">Selecciona cada forma → botón de color → código hex (Google: "ODS 4 color hex").</div></div></div><div class="step-row"><div class="step-circle">4</div><div class="step-content"><div class="step-title">Exporta como PNG</div><div class="step-desc">Cámara de frente → <kbd>Win+Shift+S</kbd> (Windows) o <kbd>Cmd+Shift+4</kbd> (Mac) → recorta → guarda como PNG.</div></div></div><div class="step-row"><div class="step-circle">5</div><div class="step-content"><div class="step-title">Guarda con el nombre exacto: <code>logo_ods.png</code></div><div class="step-desc">En la misma carpeta que el .py.</div></div></div></div><div class="highlight-box">El logo no tiene que ser perfecto. Lo importante es que represente vuestro ODS.</div></div></div>
+</section>
+
+<!-- S4 -->
+<section id="s4">
+  <div class="section-title">🧩 Diseña el contenido del quiz</div>
+  <p class="section-lead">Antes de programar, el equipo diseña las preguntas. Una buena pregunta tiene una respuesta correcta clara y tres distractores creíbles pero incorrectos.</p>
+  <div class="tabs"><button class="tab active" onclick="switchTab(this,'t1')">Cómo escribir preguntas</button><button class="tab" onclick="switchTab(this,'t2')">Ejemplos</button><button class="tab" onclick="switchTab(this,'t3')">Plantilla</button></div>
+  <div id="t1" class="tab-panel active"><div class="card"><div class="card-title">Reglas de oro</div><div class="card-body"><ul style="padding-left:1.2rem;line-height:2.1;font-size:0.92rem;color:rgba(240,238,232,0.75);"><li><strong style="color:#fff;">Una sola idea por pregunta.</strong></li><li><strong style="color:#fff;">Autosuficiente.</strong> Se entiende sin contexto previo.</li><li><strong style="color:#fff;">Evita el "no"</strong> en la pregunta.</li><li><strong style="color:#fff;">Distractores plausibles</strong> pero incorrectos para quien sabe el tema.</li><li><strong style="color:#fff;">La respuesta correcta</strong> no destaca por ser más larga.</li><li><strong style="color:#fff;">Varía las posiciones</strong> de la respuesta correcta.</li></ul></div></div></div>
+  <div id="t2" class="tab-panel">
+    <div class="card"><div class="card-title">✅ Pregunta bien formulada</div><div class="card-body"><div class="question-card"><div class="q-label">ODS 4: Educación de calidad</div><div class="q-text">Según la UNESCO, ¿cuántos niños y niñas en el mundo no tienen acceso a la educación primaria?</div><div class="q-options"><div class="q-opt wrong">A. Unos 20 millones</div><div class="q-opt correct">B. Más de 250 millones</div><div class="q-opt wrong">C. Unos 5 millones</div><div class="q-opt wrong">D. Unos 80 millones</div></div></div><div class="highlight-box">Los distractores son plausibles. La respuesta correcta no destaca por el formato.</div></div></div>
+    <div class="card"><div class="card-title">❌ Pregunta mal formulada</div><div class="card-body"><div class="question-card"><div class="q-label">Evitar este estilo</div><div class="q-text">¿Cuál de estas afirmaciones NO es correcta sobre el ODS 4?</div><div class="q-options"><div class="q-opt wrong">A. Busca mejorar la educación</div><div class="q-opt wrong">B. Fue aprobado en 2015</div><div class="q-opt correct">C. Solo afecta a países en desarrollo</div><div class="q-opt wrong">D. Incluye metas para 2030</div></div></div><div class="warn-box">El "NO" confunde y no evalúa bien el conocimiento real.</div></div></div>
+  </div>
+  <div id="t3" class="tab-panel"><div class="card"><div class="card-title">Plantilla para vuestras 5 preguntas</div><div class="card-body"><div class="info-box">Rellenad esto antes de abrir el código.</div><pre><span class="cm">--- PREGUNTA 1 ---</span>
+<span class="var">Texto</span>: ¿Aquí escribís la pregunta?
+<span class="var">A</span>: Opción A
+<span class="var">B</span>: Opción B
+<span class="var">C</span>: Opción C
+<span class="var">D</span>: Opción D
+<span class="var">Respuesta correcta</span>: A / B / C / D
+<span class="var">Fuente</span>: ¿De dónde habéis sacado el dato?
+
+<span class="cm">--- PREGUNTA 2, 3, 4, 5 --- (repetid el bloque)</span></pre></div></div></div>
+</section>
+
+<!-- S5 -->
+<section id="s5">
+  <div class="section-title">💻 Programa tu quiz</div>
+  <p class="section-lead">Aquí tienes la plantilla base completa y explicada. Entender el código es más importante que copiarlo.</p>
+  <div class="warn-box"><strong>Antes de empezar:</strong> instala Pygame si no lo tienes. En la terminal: <code>pip install pygame</code></div>
+  <div class="tabs"><button class="tab active" onclick="switchTab(this,'c1')">Estructura general</button><button class="tab" onclick="switchTab(this,'c2')">Plantilla completa</button><button class="tab" onclick="switchTab(this,'c3')">Qué modificar</button></div>
+  <div id="c1" class="tab-panel active"><div class="card"><div class="card-title">¿Cómo está organizado el programa?</div><div class="card-body"><div class="highlight-box"><strong>1. Importaciones y configuración</strong> → Pygame, pantalla, colores y fuentes.<br><br><strong>2. Archivos opcionales con os.path.exists()</strong> → Imagen, logo y sonidos se cargan solo si el archivo existe. Si no están, el programa arranca igual.<br><br><strong>3. Lista de preguntas</strong> → Diccionarios con texto, opciones y respuesta correcta.<br><br><strong>4. Función dibujar_texto()</strong> → Texto largo con ajuste automático de línea.<br><br><strong>5. Bucle principal while True</strong> → Mantiene la ventana abierta y detecta pulsaciones.<br><br><strong>6. Pantalla final</strong> → Muestra la puntuación.</div></div></div></div>
+  <div id="c2" class="tab-panel"><div class="card"><div class="card-title">Plantilla completa</div><div class="card-body"><pre>
+<span class="kw">import</span> pygame, sys, os
+pygame.init(); pygame.mixer.init()
+ANCHO, ALTO = <span class="num">800</span>, <span class="num">600</span>
+pantalla = pygame.display.set_mode((ANCHO, ALTO))
+pygame.display.set_caption(<span class="str">"Quiz ODS — Vuestro título aquí"</span>)
+BLANCO=(<span class="num">255</span>,<span class="num">255</span>,<span class="num">255</span>); VERDE=(<span class="num">46</span>,<span class="num">160</span>,<span class="num">67</span>); ROJO=(<span class="num">200</span>,<span class="num">50</span>,<span class="num">50</span>)
+AZUL=(<span class="num">50</span>,<span class="num">100</span>,<span class="num">200</span>); FONDO_COLOR=(<span class="num">20</span>,<span class="num">40</span>,<span class="num">80</span>)
+fuente_grande=pygame.font.SysFont(<span class="str">"Arial"</span>,<span class="num">32</span>,bold=<span class="kw">True</span>)
+fuente_normal=pygame.font.SysFont(<span class="str">"Arial"</span>,<span class="num">22</span>)
+fuente_pequeña=pygame.font.SysFont(<span class="str">"Arial"</span>,<span class="num">18</span>)
+<span class="kw">if</span> os.path.exists(<span class="str">"fondo.jpg"</span>):
+    fondo=pygame.image.load(<span class="str">"fondo.jpg"</span>); fondo=pygame.transform.scale(fondo,(ANCHO,ALTO))
+<span class="kw">else</span>: fondo=<span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"logo_ods.png"</span>):
+    logo=pygame.image.load(<span class="str">"logo_ods.png"</span>); logo=pygame.transform.scale(logo,(<span class="num">100</span>,<span class="num">100</span>))
+<span class="kw">else</span>: logo=<span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"acierto.wav"</span>): sonido_acierto=pygame.mixer.Sound(<span class="str">"acierto.wav"</span>)
+<span class="kw">else</span>: sonido_acierto=<span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"error.wav"</span>): sonido_error=pygame.mixer.Sound(<span class="str">"error.wav"</span>)
+<span class="kw">else</span>: sonido_error=<span class="kw">None</span>
+preguntas = [
+    {<span class="str">"texto"</span>:<span class="str">"¿Cuántos ODS tiene la Agenda 2030 de la ONU?"</span>,
+     <span class="str">"opciones"</span>:[<span class="str">"A) 10"</span>,<span class="str">"B) 17"</span>,<span class="str">"C) 21"</span>,<span class="str">"D) 8"</span>],<span class="str">"correcta"</span>:<span class="str">"B"</span>},
+    <span class="cm"># ── Añadid vuestras preguntas aquí ──</span>
+]
+<span class="kw">def</span> <span class="fn">dibujar_texto</span>(sup,texto,fuente,color,x,y,max_ancho=<span class="num">700</span>):
+    palabras=texto.split(); linea,lineas=<span class="str">""</span>,[]
+    <span class="kw">for</span> p <span class="kw">in</span> palabras:
+        prueba=linea+p+<span class="str">" "</span>
+        <span class="kw">if</span> fuente.size(prueba)[<span class="num">0</span>]&gt;max_ancho: lineas.append(linea); linea=p+<span class="str">" "</span>
+        <span class="kw">else</span>: linea=prueba
+    lineas.append(linea)
+    <span class="kw">for</span> i,l <span class="kw">in</span> <span class="fn">enumerate</span>(lineas):
+        sup.blit(fuente.render(l,<span class="kw">True</span>,color),(x,y+i*fuente.get_linesize()))
+indice,puntuacion=<span class="num">0</span>,<span class="num">0</span>; esperar=<span class="kw">False</span>
+resultado_texto,resultado_color=<span class="str">""</span>,BLANCO
+reloj=pygame.time.Clock()
+<span class="kw">while True</span>:
+    <span class="kw">if</span> fondo: pantalla.blit(fondo,(<span class="num">0</span>,<span class="num">0</span>))
+    <span class="kw">else</span>: pantalla.fill(FONDO_COLOR)
+    <span class="kw">if</span> logo: pantalla.blit(logo,(ANCHO-<span class="num">120</span>,<span class="num">20</span>))
+    <span class="kw">if</span> indice&gt;=<span class="fn">len</span>(preguntas):
+        dibujar_texto(pantalla,<span class="str">f"¡Completado! {puntuacion}/{len(preguntas)} correctas"</span>,fuente_grande,BLANCO,<span class="num">80</span>,<span class="num">220</span>)
+        dibujar_texto(pantalla,<span class="str">"Pulsa ESC para salir"</span>,fuente_normal,BLANCO,<span class="num">240</span>,<span class="num">300</span>)
+    <span class="kw">else</span>:
+        p=preguntas[indice]
+        dibujar_texto(pantalla,<span class="str">f"Pregunta {indice+1} de {len(preguntas)}"</span>,fuente_pequeña,AZUL,<span class="num">50</span>,<span class="num">30</span>)
+        dibujar_texto(pantalla,p[<span class="str">"texto"</span>],fuente_grande,BLANCO,<span class="num">50</span>,<span class="num">80</span>)
+        <span class="kw">for</span> i,op <span class="kw">in</span> <span class="fn">enumerate</span>(p[<span class="str">"opciones"</span>]):
+            dibujar_texto(pantalla,op,fuente_normal,BLANCO,<span class="num">80</span>,<span class="num">220</span>+i*<span class="num">60</span>)
+        dibujar_texto(pantalla,<span class="str">"Pulsa A / B / C / D para responder"</span>,fuente_pequeña,(<span class="num">180</span>,<span class="num">180</span>,<span class="num">180</span>),<span class="num">50</span>,<span class="num">490</span>)
+        <span class="kw">if</span> resultado_texto:
+            dibujar_texto(pantalla,resultado_texto,fuente_grande,resultado_color,<span class="num">80</span>,<span class="num">530</span>)
+            dibujar_texto(pantalla,<span class="str">"  (pulsa cualquier tecla para continuar)"</span>,fuente_pequeña,(<span class="num">180</span>,<span class="num">180</span>,<span class="num">180</span>),<span class="num">80</span>,<span class="num">565</span>)
+    <span class="kw">for</span> evento <span class="kw">in</span> pygame.event.get():
+        <span class="kw">if</span> evento.type==pygame.QUIT: pygame.quit(); sys.exit()
+        <span class="kw">if</span> evento.type==pygame.KEYDOWN:
+            <span class="kw">if</span> evento.key==pygame.K_ESCAPE: pygame.quit(); sys.exit()
+            <span class="kw">if not</span> esperar <span class="kw">and</span> indice&lt;<span class="fn">len</span>(preguntas):
+                tecla={pygame.K_a:<span class="str">"A"</span>,pygame.K_b:<span class="str">"B"</span>,pygame.K_c:<span class="str">"C"</span>,pygame.K_d:<span class="str">"D"</span>}.get(evento.key)
+                <span class="kw">if</span> tecla:
+                    <span class="kw">if</span> tecla==preguntas[indice][<span class="str">"correcta"</span>]:
+                        <span class="kw">if</span> sonido_acierto: sonido_acierto.play()
+                        resultado_texto=<span class="str">"✓  ¡Correcto!"</span>;resultado_color=VERDE;puntuacion+=<span class="num">1</span>
+                    <span class="kw">else</span>:
+                        <span class="kw">if</span> sonido_error: sonido_error.play()
+                        cx=preguntas[indice][<span class="str">"opciones"</span>][<span class="str">"ABCD"</span>.index(preguntas[indice][<span class="str">"correcta"</span>])]
+                        resultado_texto=<span class="str">f"✗  Incorrecto — era: {cx}"</span>;resultado_color=ROJO
+                    esperar=<span class="kw">True</span>
+            <span class="kw">elif</span> esperar: indice+=<span class="num">1</span>;resultado_texto=<span class="str">""</span>;esperar=<span class="kw">False</span>
+    pygame.display.flip(); reloj.tick(<span class="num">30</span>)
+</pre></div></div></div>
+  <div id="c3" class="tab-panel"><div class="card"><div class="card-title">¿Qué tenéis que cambiar?</div><div class="card-body"><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div><strong>Título:</strong> Cambiad "Quiz ODS — Vuestro título aquí".</li><li><div class="check" onclick="toggle(this)"></div><strong>Colores RGB:</strong> Cambiad FONDO_COLOR y demás por los colores de vuestro ODS.</li><li><div class="check" onclick="toggle(this)"></div><strong>Preguntas:</strong> Rellenad la lista preguntas con vuestras 5.</li><li><div class="check" onclick="toggle(this)"></div><strong>Imagen, logo y sonidos:</strong> Consultad la sección Imagen y sonido.</li></ul><div class="highlight-box">El programa arranca aunque aún no tengáis la imagen, el logo ni los sonidos.</div></div></div></div>
+</section>
+
+<!-- S6 -->
+<section id="s6">
+  <div class="section-title">🖼️ Imagen y sonido</div>
+  <p class="section-lead">Cuando las preguntas ya funcionen, seguid estos pasos para añadir imagen, logotipo y sonidos sin tocar nada de lo que ya habéis programado.</p>
+  <div class="card"><div class="card-title">La carpeta del proyecto — cómo encontrarla en PyCharm</div><div class="card-body">
+      <p>Todos los archivos (imagen, logo, sonidos, vídeo) deben ir en la <strong style="color:#fff;">misma carpeta que vuestro archivo .py</strong>. Para saber exactamente dónde está esa carpeta:</p>
+      <div class="steps-visual">
+        <div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title">En el panel izquierdo de PyCharm, clic derecho sobre el nombre del proyecto</div></div></div>
+        <div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title">"Open In" → "Explorer" (Windows) o "Finder" (Mac)</div><div class="step-desc">Se abre la carpeta directamente. Copiad aquí vuestros archivos.</div></div></div>
+        <div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title">O mirad la ruta en la barra inferior de PyCharm</div><div class="step-desc">Ejemplo: <code>C:\Users\Paco\PycharmProjects\PythonProject</code></div></div></div>
+      </div>
+      <div class="folder-diagram"><span class="f-folder">📁 PythonProject/  (o como se llame vuestro proyecto en PyCharm)</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">quiz_ods.py</span><span class="f-ok">← el código</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo.jpg</span><span class="f-ok">← imagen de fondo</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">logo_ods.png</span><span class="f-ok">← logotipo de Tinkercad</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">acierto.wav</span><span class="f-ok">← sonido de acierto</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">error.wav</span><span class="f-ok">← sonido de error</span></div>
+      <div class="danger-box"><strong>Dos errores muy frecuentes:</strong><br>① El nombre del archivo no coincide exactamente — deben llamarse así, sin mayúsculas ni espacios.<br>② El archivo está en Descargas o en el Escritorio en lugar de en la carpeta del proyecto — el programa no lo encontrará.</div>
+    </div></div>
+  <div class="card"><div class="card-title">📋 Plantilla guiada de inserción</div><div class="card-body"><p style="margin-bottom:1.2rem;">Abrid quiz_ods.py en PyCharm. Cambios en tres zonas. <strong style="color:#fff;">No toquéis nada más.</strong></p>
+    <div class="insert-block"><div class="insert-header"><span class="tag tag-donde">Zona 1</span><span class="insert-label">Justo antes de preguntas = [</span></div><div class="insert-body"><pre>
+<span class="kw">if</span> os.path.exists(<span class="str">"fondo.jpg"</span>):
+    fondo=pygame.image.load(<span class="str">"fondo.jpg"</span>); fondo=pygame.transform.scale(fondo,(ANCHO,ALTO))
+<span class="kw">else</span>: fondo=<span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"logo_ods.png"</span>):
+    logo=pygame.image.load(<span class="str">"logo_ods.png"</span>); logo=pygame.transform.scale(logo,(<span class="num">100</span>,<span class="num">100</span>))
+<span class="kw">else</span>: logo=<span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"acierto.wav"</span>): sonido_acierto=pygame.mixer.Sound(<span class="str">"acierto.wav"</span>)
+<span class="kw">else</span>: sonido_acierto=<span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"error.wav"</span>): sonido_error=pygame.mixer.Sound(<span class="str">"error.wav"</span>)
+<span class="kw">else</span>: sonido_error=<span class="kw">None</span></pre></div></div>
+    <div class="insert-block"><div class="insert-header"><span class="tag tag-donde">Zona 2</span><span class="insert-label">Primeras líneas dentro de while True:</span></div><div class="insert-body"><pre>
+    <span class="kw">if</span> fondo: pantalla.blit(fondo,(<span class="num">0</span>,<span class="num">0</span>))
+    <span class="kw">else</span>: pantalla.fill(FONDO_COLOR)
+    <span class="kw">if</span> logo: pantalla.blit(logo,(ANCHO-<span class="num">120</span>,<span class="num">20</span>))</pre><div class="warn-box">Deben ir <strong>antes</strong> de que el código dibuje preguntas y texto.</div></div></div>
+    <div class="insert-block"><div class="insert-header"><span class="tag tag-donde">Zona 3</span><span class="insert-label">Dentro del bloque que comprueba la respuesta</span></div><div class="insert-body"><pre>
+                <span class="kw">if</span> tecla==preguntas[indice][<span class="str">"correcta"</span>]:
+<span class="hl">                    <span class="kw">if</span> sonido_acierto: sonido_acierto.play()  ← añadir</span>
+                    resultado_texto=<span class="str">"✓  ¡Correcto!"</span>; resultado_color=VERDE; puntuacion+=<span class="num">1</span>
+                <span class="kw">else</span>:
+<span class="hl">                    <span class="kw">if</span> sonido_error: sonido_error.play()      ← añadir</span>
+                    resultado_texto=<span class="str">"✗  Incorrecto"</span>; resultado_color=ROJO</pre></div></div>
+    <div class="insert-block"><div class="insert-header"><span class="tag tag-notocar">No tocar</span><span class="insert-label">Vuestra lista de preguntas</span></div><div class="insert-body"><pre>preguntas = [ { <span class="str">"texto"</span>:..., <span class="str">"opciones"</span>:[...], <span class="str">"correcta"</span>:<span class="str">"B"</span> }, ... ]</pre></div></div>
+  </div></div>
+  <div class="card"><div class="card-title">🖼️ Imagen de fondo</div><div class="card-body"><a class="big-link" href="https://unsplash.com" target="_blank"><div class="big-link-icon">📷</div><div class="big-link-text"><div class="lbl">Unsplash</div><div class="sub">Fotografías libres de derechos</div></div><span class="arrow">↗</span></a><a class="big-link" href="https://www.canva.com" target="_blank"><div class="big-link-icon">🎨</div><div class="big-link-text"><div class="lbl">Canva</div><div class="sub">Cread vosotros un fondo personalizado</div></div><span class="arrow">↗</span></a><a class="big-link" href="https://pixabay.com/es/" target="_blank"><div class="big-link-icon">🖼️</div><div class="big-link-text"><div class="lbl">Pixabay</div><div class="sub">Imágenes gratuitas</div></div><span class="arrow">↗</span></a><div class="info-box">Guardad la imagen como <code>fondo.jpg</code> en la misma carpeta que el .py.</div></div></div>
+  <div class="card"><div class="card-title">🔊 Sonidos</div><div class="card-body"><div class="warn-box"><strong>¿Por qué no se oye nada?</strong> Necesitáis los archivos <code>acierto.wav</code> y <code>error.wav</code> en la carpeta.</div><a class="big-link" href="https://freesound.org" target="_blank"><div class="big-link-icon">🔊</div><div class="big-link-text"><div class="lbl">Freesound.org</div><div class="sub">Busca "correct" o "wrong" — licencia CC</div></div><span class="arrow">↗</span></a><a class="big-link" href="https://pixabay.com/sound-effects/" target="_blank"><div class="big-link-icon">🎵</div><div class="big-link-text"><div class="lbl">Pixabay Sound Effects</div><div class="sub">Efectos cortos, libres de derechos</div></div><span class="arrow">↗</span></a><a class="big-link" href="https://cloudconvert.com/mp3-to-wav" target="_blank"><div class="big-link-icon">🔄</div><div class="big-link-text"><div class="lbl">CloudConvert MP3→WAV</div><div class="sub">Si el archivo viene en .mp3</div></div><span class="arrow">↗</span></a></div></div>
+</section>
+
+
+<!-- S6B VIDEO -->
+<section id="s6b">
+  <div class="section-title">🎬 Vídeo en esquina con OpenCV</div>
+  <p class="section-lead">Vais a añadir el vídeo como elemento decorativo en una esquina de la pantalla, manteniendo la imagen de fondo que ya habéis creado. El trabajo de diseño que ya tenéis no se toca.</p>
+
+  <div class="card">
+    <div class="card-title">¿Cómo queda la pantalla?</div>
+    <div class="card-body">
+      <p>El resultado es una composición con tres capas dibujadas en orden:</p>
+      <div class="highlight-box">
+        <strong>Capa 1 — fondo.jpg</strong>: vuestra imagen de fondo ocupa toda la pantalla, igual que antes.<br><br>
+        <strong>Capa 2 — vídeo en esquina</strong>: el vídeo se reproduce en bucle en la esquina inferior derecha, en un recuadro de 200×150 px.<br><br>
+        <strong>Capa 3 — logo, texto y preguntas</strong>: todo lo demás se dibuja encima, sin cambios.
+      </div>
+      <div class="info-box">El vídeo se puede colocar en cualquier esquina cambiando sus coordenadas. Por defecto va a la esquina inferior derecha para no interferir con las preguntas.</div>
+      <div class="warn-box"><strong>Instalación previa:</strong> en la terminal escribid: <code>pip install opencv-python</code></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">La carpeta del proyecto — sin cambios en los nombres</div>
+    <div class="card-body">
+      <div class="folder-diagram"><span class="f-folder">📁 mi_quiz_ods/</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">quiz_ods.py</span><span class="f-ok">← el código</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo.jpg</span><span class="f-ok">← vuestra imagen de fondo (se mantiene)</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo_ods.mp4</span><span class="f-ok">← vídeo en esquina (nuevo)</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">logo_ods.png</span><span class="f-ok">← logotipo de Tinkercad</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">acierto.wav</span><span class="f-ok">← sonido de acierto</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">error.wav</span><span class="f-ok">← sonido de error</span></div>
+      <div class="highlight-box">El archivo <code>fondo.jpg</code> sigue siendo vuestro fondo principal. El vídeo <code>fondo_ods.mp4</code> se añade encima, en un recuadro pequeño.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📋 Plantilla guiada — cómo añadir el vídeo al código</div>
+    <div class="card-body">
+      <p style="margin-bottom:1.2rem;">Solo tenéis que hacer cambios en <strong style="color:#fff;">dos zonas</strong>. <strong style="color:#fff;">El resto del código no se toca en absoluto.</strong></p>
+
+      <div class="insert-block">
+        <div class="insert-header"><span class="tag tag-donde">Zona 1</span><span class="insert-label">Al inicio, junto a los otros imports — añadid esta línea</span></div>
+        <div class="insert-body"><pre>
+<span class="kw">import</span> cv2   <span class="cm"># librería para leer el vídeo fotograma a fotograma</span></pre>
+        <p style="font-size:0.85rem;color:rgba(240,238,232,0.5);margin-top:0.8rem;">El resto de imports (<code>pygame</code>, <code>sys</code>, <code>os</code>) y todo el bloque de <code>fondo.jpg</code>, logo y sonidos quedan <strong>exactamente igual</strong>.</p>
+        </div>
+      </div>
+
+      <div class="insert-block">
+        <div class="insert-header"><span class="tag tag-donde">Zona 2</span><span class="insert-label">Justo después del bloque de fondo.jpg y logo — añadid este bloque nuevo</span></div>
+        <div class="insert-body">
+          <div class="info-box">Este bloque va <strong>a continuación</strong> del que ya tenéis de <code>fondo.jpg</code> y <code>logo_ods.png</code>. No lo sustituyáis, añadidlo después.</div>
+          <pre>
+<span class="cm"># ── VÍDEO EN ESQUINA ──────────────────────────────────────────</span>
+<span class="cm"># Guardad el vídeo como  fondo_ods.mp4  en la misma carpeta</span>
+<span class="cm"># Se mostrará en un recuadro de 200x150 en la esquina inferior derecha</span>
+VIDEO_ANCHO, VIDEO_ALTO = <span class="num">200</span>, <span class="num">150</span>
+VIDEO_X = ANCHO - VIDEO_ANCHO - <span class="num">10</span>   <span class="cm"># 10 px de margen derecho</span>
+VIDEO_Y = ALTO  - VIDEO_ALTO  - <span class="num">10</span>   <span class="cm"># 10 px de margen inferior</span>
+
+<span class="kw">if</span> os.path.exists(<span class="str">"fondo_ods.mp4"</span>):
+    video = cv2.VideoCapture(<span class="str">"fondo_ods.mp4"</span>)
+    usar_video = <span class="kw">True</span>
+<span class="kw">else</span>:
+    video = <span class="kw">None</span>
+    usar_video = <span class="kw">False</span>
+
+<span class="kw">def</span> <span class="fn">obtener_fotograma_esquina</span>(cap):
+    <span class="str">"""Lee el siguiente fotograma y lo escala al tamaño del recuadro.
+    Si el vídeo termina, vuelve al inicio automáticamente."""</span>
+    ret, frame = cap.read()
+    <span class="kw">if not</span> ret:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, <span class="num">0</span>)
+        ret, frame = cap.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.resize(frame, (VIDEO_ANCHO, VIDEO_ALTO))
+    <span class="kw">return</span> pygame.surfarray.make_surface(frame.transpose(<span class="num">1</span>, <span class="num">0</span>, <span class="num">2</span>))</pre>
+        </div>
+      </div>
+
+      <div class="insert-block">
+        <div class="insert-header"><span class="tag tag-donde">Zona 3</span><span class="insert-label">Dentro de while True — después de dibujar el fondo y el logo, añadid estas líneas</span></div>
+        <div class="insert-body">
+          <div class="info-box">Las líneas del fondo (<code>if fondo: pantalla.blit(...)</code>) y del logo quedan igual. Solo añadís esto a continuación:</div>
+          <pre>
+    <span class="cm"># Dibuja el vídeo en la esquina inferior derecha</span>
+    <span class="kw">if</span> usar_video <span class="kw">and</span> video:
+        fotograma = <span class="fn">obtener_fotograma_esquina</span>(video)
+        pantalla.blit(fotograma, (VIDEO_X, VIDEO_Y))
+        <span class="cm"># Marco opcional alrededor del vídeo</span>
+        pygame.draw.rect(pantalla, BLANCO,
+            (VIDEO_X - <span class="num">2</span>, VIDEO_Y - <span class="num">2</span>,
+             VIDEO_ANCHO + <span class="num">4</span>, VIDEO_ALTO + <span class="num">4</span>), <span class="num">2</span>)</pre>
+          <div class="highlight-box">El marco blanco es opcional: si no os gusta, borrad las dos últimas líneas (<code>pygame.draw.rect</code>). Podéis cambiar el color del marco por cualquier color RGB.</div>
+        </div>
+      </div>
+
+      <div class="insert-block">
+        <div class="insert-header"><span class="tag tag-notocar">No tocar</span><span class="insert-label">Todo lo demás — preguntas, sonidos, lógica de respuestas, pantalla final</span></div>
+        <div class="insert-body"><pre>
+<span class="cm"># fondo.jpg, logo_ods.png, acierto.wav, error.wav → sin cambios</span>
+<span class="cm"># lista preguntas, función dibujar_texto → sin cambios</span>
+<span class="cm"># lógica de respuestas, puntuación, pantalla final → sin cambios</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Plantilla completa con vídeo en esquina</div>
+    <div class="card-body">
+      <p style="font-size:0.85rem;color:rgba(240,238,232,0.5);margin-bottom:0.8rem;">Versión final con imagen de fondo propia + vídeo en esquina. Sustituid <code>fondo.jpg</code> por vuestro archivo real.</p>
+      <pre>
+<span class="kw">import</span> pygame, sys, os, cv2
+pygame.init(); pygame.mixer.init()
+
+ANCHO, ALTO = <span class="num">800</span>, <span class="num">600</span>
+pantalla = pygame.display.set_mode((ANCHO, ALTO))
+pygame.display.set_caption(<span class="str">"Quiz ODS — Vuestro título aquí"</span>)
+
+BLANCO      = (<span class="num">255</span>, <span class="num">255</span>, <span class="num">255</span>)
+VERDE       = (<span class="num">46</span>,  <span class="num">160</span>, <span class="num">67</span>)
+ROJO        = (<span class="num">200</span>, <span class="num">50</span>,  <span class="num">50</span>)
+AZUL        = (<span class="num">50</span>,  <span class="num">100</span>, <span class="num">200</span>)
+FONDO_COLOR = (<span class="num">20</span>,  <span class="num">40</span>,  <span class="num">80</span>)
+
+fuente_grande  = pygame.font.SysFont(<span class="str">"Arial"</span>, <span class="num">32</span>, bold=<span class="kw">True</span>)
+fuente_normal  = pygame.font.SysFont(<span class="str">"Arial"</span>, <span class="num">22</span>)
+fuente_pequeña = pygame.font.SysFont(<span class="str">"Arial"</span>, <span class="num">18</span>)
+
+<span class="cm"># ── IMAGEN DE FONDO (la vuestra) ──────────────────────────────</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"fondo.jpg"</span>):
+    fondo = pygame.image.load(<span class="str">"fondo.jpg"</span>)
+    fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
+<span class="kw">else</span>:
+    fondo = <span class="kw">None</span>
+
+<span class="cm"># ── LOGOTIPO 3D ───────────────────────────────────────────────</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"logo_ods.png"</span>):
+    logo = pygame.image.load(<span class="str">"logo_ods.png"</span>)
+    logo = pygame.transform.scale(logo, (<span class="num">100</span>, <span class="num">100</span>))
+<span class="kw">else</span>:
+    logo = <span class="kw">None</span>
+
+<span class="cm"># ── SONIDOS ───────────────────────────────────────────────────</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"acierto.wav"</span>): sonido_acierto = pygame.mixer.Sound(<span class="str">"acierto.wav"</span>)
+<span class="kw">else</span>: sonido_acierto = <span class="kw">None</span>
+<span class="kw">if</span> os.path.exists(<span class="str">"error.wav"</span>): sonido_error = pygame.mixer.Sound(<span class="str">"error.wav"</span>)
+<span class="kw">else</span>: sonido_error = <span class="kw">None</span>
+
+<span class="cm"># ── VÍDEO EN ESQUINA INFERIOR DERECHA ─────────────────────────</span>
+VIDEO_ANCHO, VIDEO_ALTO = <span class="num">200</span>, <span class="num">150</span>
+VIDEO_X = ANCHO - VIDEO_ANCHO - <span class="num">10</span>
+VIDEO_Y = ALTO  - VIDEO_ALTO  - <span class="num">10</span>
+
+<span class="kw">if</span> os.path.exists(<span class="str">"fondo_ods.mp4"</span>):
+    video = cv2.VideoCapture(<span class="str">"fondo_ods.mp4"</span>)
+    usar_video = <span class="kw">True</span>
+<span class="kw">else</span>:
+    video = <span class="kw">None</span>
+    usar_video = <span class="kw">False</span>
+
+<span class="kw">def</span> <span class="fn">obtener_fotograma_esquina</span>(cap):
+    ret, frame = cap.read()
+    <span class="kw">if not</span> ret:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, <span class="num">0</span>)
+        ret, frame = cap.read()
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.resize(frame, (VIDEO_ANCHO, VIDEO_ALTO))
+    <span class="kw">return</span> pygame.surfarray.make_surface(frame.transpose(<span class="num">1</span>, <span class="num">0</span>, <span class="num">2</span>))
+
+<span class="cm"># ── PREGUNTAS — rellenad con las vuestras ─────────────────────</span>
+preguntas = [
+    {
+        <span class="str">"texto"</span>  : <span class="str">"¿Cuántos ODS tiene la Agenda 2030 de la ONU?"</span>,
+        <span class="str">"opciones"</span>: [<span class="str">"A) 10"</span>, <span class="str">"B) 17"</span>, <span class="str">"C) 21"</span>, <span class="str">"D) 8"</span>],
+        <span class="str">"correcta"</span>: <span class="str">"B"</span>
+    },
+    <span class="cm"># ── Añadid el resto de preguntas aquí ──</span>
+]
+
+<span class="cm"># ── FUNCIÓN: texto con ajuste de línea ────────────────────────</span>
+<span class="kw">def</span> <span class="fn">dibujar_texto</span>(sup, texto, fuente, color, x, y, max_ancho=<span class="num">700</span>):
+    palabras = texto.split(); linea, lineas = <span class="str">""</span>, []
+    <span class="kw">for</span> p <span class="kw">in</span> palabras:
+        prueba = linea + p + <span class="str">" "</span>
+        <span class="kw">if</span> fuente.size(prueba)[<span class="num">0</span>] &gt; max_ancho: lineas.append(linea); linea = p + <span class="str">" "</span>
+        <span class="kw">else</span>: linea = prueba
+    lineas.append(linea)
+    <span class="kw">for</span> i, l <span class="kw">in</span> <span class="fn">enumerate</span>(lineas):
+        sup.blit(fuente.render(l, <span class="kw">True</span>, color), (x, y + i * fuente.get_linesize()))
+
+<span class="cm"># ── BUCLE PRINCIPAL ───────────────────────────────────────────</span>
+indice, puntuacion = <span class="num">0</span>, <span class="num">0</span>
+esperar = <span class="kw">False</span>
+resultado_texto, resultado_color = <span class="str">""</span>, BLANCO
+reloj = pygame.time.Clock()
+
+<span class="kw">while True</span>:
+
+    <span class="cm"># Capa 1: imagen de fondo (la vuestra)</span>
+    <span class="kw">if</span> fondo: pantalla.blit(fondo, (<span class="num">0</span>, <span class="num">0</span>))
+    <span class="kw">else</span>:     pantalla.fill(FONDO_COLOR)
+
+    <span class="cm"># Capa 2: vídeo en esquina inferior derecha</span>
+    <span class="kw">if</span> usar_video <span class="kw">and</span> video:
+        fotograma = <span class="fn">obtener_fotograma_esquina</span>(video)
+        pantalla.blit(fotograma, (VIDEO_X, VIDEO_Y))
+        pygame.draw.rect(pantalla, BLANCO,
+            (VIDEO_X - <span class="num">2</span>, VIDEO_Y - <span class="num">2</span>, VIDEO_ANCHO + <span class="num">4</span>, VIDEO_ALTO + <span class="num">4</span>), <span class="num">2</span>)
+
+    <span class="cm"># Capa 3: logo, preguntas y texto</span>
+    <span class="kw">if</span> logo: pantalla.blit(logo, (ANCHO - <span class="num">120</span>, <span class="num">20</span>))
+
+    <span class="kw">if</span> indice &gt;= <span class="fn">len</span>(preguntas):
+        dibujar_texto(pantalla,
+            <span class="str">f"¡Completado! {puntuacion}/{len(preguntas)} correctas"</span>,
+            fuente_grande, BLANCO, <span class="num">80</span>, <span class="num">220</span>)
+        dibujar_texto(pantalla, <span class="str">"Pulsa ESC para salir"</span>,
+            fuente_normal, BLANCO, <span class="num">240</span>, <span class="num">300</span>)
+    <span class="kw">else</span>:
+        p = preguntas[indice]
+        dibujar_texto(pantalla,
+            <span class="str">f"Pregunta {indice+1} de {len(preguntas)}"</span>,
+            fuente_pequeña, AZUL, <span class="num">50</span>, <span class="num">30</span>)
+        dibujar_texto(pantalla, p[<span class="str">"texto"</span>], fuente_grande, BLANCO, <span class="num">50</span>, <span class="num">80</span>)
+        <span class="kw">for</span> i, op <span class="kw">in</span> <span class="fn">enumerate</span>(p[<span class="str">"opciones"</span>]):
+            dibujar_texto(pantalla, op, fuente_normal, BLANCO,
+                          <span class="num">80</span>, <span class="num">220</span> + i * <span class="num">60</span>)
+        dibujar_texto(pantalla,
+            <span class="str">"Pulsa A / B / C / D para responder"</span>,
+            fuente_pequeña, (<span class="num">180</span>, <span class="num">180</span>, <span class="num">180</span>), <span class="num">50</span>, <span class="num">490</span>)
+        <span class="kw">if</span> resultado_texto:
+            dibujar_texto(pantalla, resultado_texto,
+                fuente_grande, resultado_color, <span class="num">80</span>, <span class="num">530</span>)
+            dibujar_texto(pantalla,
+                <span class="str">"  (pulsa cualquier tecla para continuar)"</span>,
+                fuente_pequeña, (<span class="num">180</span>, <span class="num">180</span>, <span class="num">180</span>), <span class="num">80</span>, <span class="num">565</span>)
+
+    <span class="kw">for</span> evento <span class="kw">in</span> pygame.event.get():
+        <span class="kw">if</span> evento.type == pygame.QUIT: pygame.quit(); sys.exit()
+        <span class="kw">if</span> evento.type == pygame.KEYDOWN:
+            <span class="kw">if</span> evento.key == pygame.K_ESCAPE: pygame.quit(); sys.exit()
+            <span class="kw">if not</span> esperar <span class="kw">and</span> indice &lt; <span class="fn">len</span>(preguntas):
+                tecla = {
+                    pygame.K_a: <span class="str">"A"</span>, pygame.K_b: <span class="str">"B"</span>,
+                    pygame.K_c: <span class="str">"C"</span>, pygame.K_d: <span class="str">"D"</span>
+                }.get(evento.key)
+                <span class="kw">if</span> tecla:
+                    <span class="kw">if</span> tecla == preguntas[indice][<span class="str">"correcta"</span>]:
+                        <span class="kw">if</span> sonido_acierto: sonido_acierto.play()
+                        resultado_texto  = <span class="str">"✓  ¡Correcto!"</span>
+                        resultado_color  = VERDE
+                        puntuacion      += <span class="num">1</span>
+                    <span class="kw">else</span>:
+                        <span class="kw">if</span> sonido_error: sonido_error.play()
+                        cx = preguntas[indice][<span class="str">"opciones"</span>][
+                            <span class="str">"ABCD"</span>.index(preguntas[indice][<span class="str">"correcta"</span>])]
+                        resultado_texto = <span class="str">f"✗  Incorrecto — era: {cx}"</span>
+                        resultado_color = ROJO
+                    esperar = <span class="kw">True</span>
+            <span class="kw">elif</span> esperar:
+                indice += <span class="num">1</span>; resultado_texto = <span class="str">""</span>; esperar = <span class="kw">False</span>
+
+    pygame.display.flip()
+    reloj.tick(<span class="num">30</span>)
+</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">¿Qué hace cada línea nueva?</div>
+    <div class="card-body">
+      <div class="steps-visual">
+        <div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title"><code>import cv2</code></div><div class="step-desc">Importa OpenCV. Sin esta línea el programa no sabe qué es cv2 y daría error.</div></div></div>
+        <div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title"><code>VIDEO_ANCHO, VIDEO_ALTO = 200, 150</code></div><div class="step-desc">Define el tamaño del recuadro donde se mostrará el vídeo. Podéis cambiar estos valores para hacerlo más grande o más pequeño.</div></div></div>
+        <div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title"><code>VIDEO_X = ANCHO - VIDEO_ANCHO - 10</code></div><div class="step-desc">Calcula la posición horizontal del recuadro. Restando el ancho del vídeo y 10 px de margen al ancho total, el vídeo queda pegado a la derecha.</div></div></div>
+        <div class="step-row"><div class="step-circle">4</div><div class="step-content"><div class="step-title"><code>cv2.VideoCapture("fondo_ods.mp4")</code></div><div class="step-desc">Abre el archivo de vídeo para leerlo fotograma a fotograma.</div></div></div>
+        <div class="step-row"><div class="step-circle">5</div><div class="step-content"><div class="step-title"><code>cap.set(cv2.CAP_PROP_POS_FRAMES, 0)</code></div><div class="step-desc">Cuando el vídeo termina, lo rebobina al fotograma 0 para que vuelva a empezar en bucle.</div></div></div>
+        <div class="step-row"><div class="step-circle">6</div><div class="step-content"><div class="step-title"><code>cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)</code></div><div class="step-desc">OpenCV guarda los colores en orden BGR y Pygame los necesita en RGB. Esta línea hace el cambio.</div></div></div>
+        <div class="step-row"><div class="step-circle">7</div><div class="step-content"><div class="step-title"><code>pygame.draw.rect(..., 2)</code></div><div class="step-desc">Dibuja un marco de 2 px alrededor del recuadro del vídeo. Es opcional: si no os gusta, simplemente borrad esas dos líneas.</div></div></div>
+      </div>
+      <div class="highlight-box">Podéis cambiar la posición del vídeo ajustando <code>VIDEO_X</code> y <code>VIDEO_Y</code>. Por ejemplo, para ponerlo en la esquina superior izquierda: <code>VIDEO_X = 10</code> y <code>VIDEO_Y = 10</code>.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Checklist — antes de pasar a mejoras</div>
+    <div class="card-body">
+      <ul class="checklist">
+        <li><div class="check" onclick="toggle(this)"></div>Hemos instalado OpenCV: <code>pip install opencv-python</code></li>
+        <li><div class="check" onclick="toggle(this)"></div>El archivo se llama exactamente <code>fondo_ods.mp4</code> y está en la carpeta del proyecto</li>
+        <li><div class="check" onclick="toggle(this)"></div>Hemos añadido <code>import cv2</code> al inicio</li>
+        <li><div class="check" onclick="toggle(this)"></div>Hemos añadido el bloque de vídeo <strong>después</strong> del bloque de fondo.jpg (no en su lugar)</li>
+        <li><div class="check" onclick="toggle(this)"></div>La imagen de fondo original sigue viéndose correctamente</li>
+        <li><div class="check" onclick="toggle(this)"></div>El vídeo aparece en la esquina inferior derecha en bucle</li>
+        <li><div class="check" onclick="toggle(this)"></div>El texto de las preguntas no queda tapado por el vídeo</li>
+        <li><div class="check" onclick="toggle(this)"></div>El logo aparece en la esquina superior derecha sin solaparse con el vídeo</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- S7 -->
+<section id="s7">
+  <div class="section-title">🔊 Mejoras y testeo</div>
+  <p class="section-lead">Con el quiz funcionando y los recursos añadidos, pulidlo y testeadlo con otro equipo.</p>
+  <div class="two-col">
+    <div class="card"><div class="card-title">Checklist de calidad</div><div class="card-body"><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div>Arranca sin errores</li><li><div class="check" onclick="toggle(this)"></div>Las 5 preguntas funcionan</li><li><div class="check" onclick="toggle(this)"></div>Suena el acierto al acertar</li><li><div class="check" onclick="toggle(this)"></div>Suena el error al fallar</li><li><div class="check" onclick="toggle(this)"></div>La imagen de fondo se ve</li><li><div class="check" onclick="toggle(this)"></div>El logotipo 3D aparece</li><li><div class="check" onclick="toggle(this)"></div>El texto se lee con claridad</li><li><div class="check" onclick="toggle(this)"></div>Al fallar muestra la correcta</li><li><div class="check" onclick="toggle(this)"></div>Puntuación final visible</li><li><div class="check" onclick="toggle(this)"></div>ESC cierra el programa</li></ul></div></div>
+    <div class="card"><div class="card-title">Mejoras opcionales</div><div class="card-body"><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div>Pantalla de inicio con ENTER</li><li><div class="check" onclick="toggle(this)"></div>Temporizador por pregunta</li><li><div class="check" onclick="toggle(this)"></div>Música de fondo</li><li><div class="check" onclick="toggle(this)"></div>Barra de progreso</li><li><div class="check" onclick="toggle(this)"></div>Pantalla final personalizada</li></ul></div></div>
+  </div>
+  <div class="card"><div class="card-title">Testeo cruzado</div><div class="card-body"><p>Intercambiad el quiz con otro equipo y responded:</p><ul style="padding-left:1.2rem;line-height:2;font-size:0.9rem;color:rgba(240,238,232,0.7);"><li>¿Las preguntas se entienden bien?</li><li>¿El texto se lee sobre el fondo?</li><li>¿Los sonidos funcionan?</li><li>¿La puntuación final es correcta?</li><li>¿Habéis aprendido algo sobre su ODS?</li></ul><div class="highlight-box">Sed concretos y constructivos.</div></div></div>
+  <div class="card"><div class="card-title">Documentación</div><div class="card-body"><a class="big-link" href="https://www.pygame.org/docs/" target="_blank"><div class="big-link-icon">📚</div><div class="big-link-text"><div class="lbl">Documentación oficial de Pygame</div><div class="sub">Referencia completa de todas las funciones</div></div><span class="arrow">↗</span></a></div></div>
+</section>
+
+<!-- S8 -->
+<section id="s8">
+  <div class="section-title">📦 Cómo entregar el proyecto</div>
+  <p class="section-lead">Antes de dar el proyecto por terminado, comprimidlo en un .zip y subidlo a Classroom.</p>
+  <div class="card"><div class="card-title">Paso 0 — ¿Dónde está la carpeta de vuestro proyecto?</div><div class="card-body">
+      <p>Antes de comprobar nada, necesitáis saber exactamente en qué carpeta del ordenador está vuestro proyecto de PyCharm. Es el paso que más confusión genera.</p>
+      <div class="steps-visual">
+        <div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Abrid PyCharm y mirad el panel izquierdo (Project)</div><div class="step-desc">Veréis el nombre de vuestro proyecto en la parte superior del panel. Haced clic derecho sobre él.</div></div></div>
+        <div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Seleccionad "Open In" → "Explorer" (Windows) o "Finder" (Mac)</div><div class="step-desc">Se abrirá directamente la carpeta del proyecto en el explorador de archivos. <strong style="color:#fff;">Esta es la carpeta donde tenéis que poner TODOS los archivos.</strong></div></div></div>
+        <div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Alternativa: mirad la ruta en la barra inferior de PyCharm</div><div class="step-desc">En la parte de abajo de PyCharm aparece la ruta completa, por ejemplo: <code>C:\Users\Paco\PycharmProjects\PythonProject</code>. Esa es vuestra carpeta.</div></div></div>
+        <div class="step-row"><div class="step-circle">4</div><div class="step-content"><div class="step-title">Copiad ahí todos los archivos de imagen, logo, sonido y vídeo</div><div class="step-desc">Arrastradlos desde Descargas o donde los tengáis hasta esa carpeta. Deben estar al mismo nivel que el archivo <code>quiz_ods.py</code>, no dentro de subcarpetas.</div></div></div>
+      </div>
+      <div class="danger-box"><strong>Error muy frecuente:</strong> poner los archivos en Descargas, en el Escritorio o en otra carpeta distinta a la del proyecto. El programa solo busca los archivos en su propia carpeta — si no están ahí, no los encuentra y no muestra ni la imagen, ni el logo, ni el vídeo.</div>
+    </div></div>
+
+  <div class="card"><div class="card-title">Paso 1 — Comprobad que la carpeta tiene todos los archivos</div><div class="card-body"><div class="folder-diagram"><span class="f-folder">📁 PythonProject/  (o como se llame vuestro proyecto)</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">quiz_ods.py</span><span class="f-ok">← el código</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo.jpg</span><span class="f-ok">✓</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">logo_ods.png</span><span class="f-ok">✓</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">acierto.wav</span><span class="f-ok">✓</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">error.wav</span><span class="f-ok">✓</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo_ods.mp4</span><span class="f-ok">✓ (si habéis añadido el vídeo)</span></div><div class="warn-box">Si algún archivo no aparece en el quiz (sin imagen, sin logo, sin sonido, sin vídeo), la causa casi siempre es que ese archivo está en otra carpeta. Comprobad la ruta.</div></div></div>
+  <div class="card"><div class="card-title">Paso 2 — Comprimid la carpeta en un .zip</div><div class="card-body"><div class="os-tabs"><button class="os-tab active" onclick="switchOs(this,'win')">Windows</button><button class="os-tab" onclick="switchOs(this,'mac')">Mac</button></div><div id="win" class="os-panel active"><div class="steps-visual"><div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Clic derecho sobre la carpeta del proyecto</div></div></div><div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Windows 11: "Comprimir en archivo ZIP" · Windows 10: "Enviar a" → "Carpeta comprimida"</div></div></div><div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Renombrad: quiz_ods_equipo3.zip</div></div></div></div></div><div id="mac" class="os-panel"><div class="steps-visual"><div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Clic derecho sobre la carpeta en el Finder</div></div></div><div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Seleccionad "Comprimir"</div></div></div><div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Renombrad: quiz_ods_equipo3.zip</div></div></div></div></div></div></div>
+  <div class="card"><div class="card-title">Paso 3 — Subid el .zip a Google Classroom</div><div class="card-body"><div class="steps-visual"><div class="step-row"><div class="step-circle">1</div><div class="step-content"><div class="step-title">Abrid la tarea "Minijuegos por los ODS" en Classroom</div></div></div><div class="step-row"><div class="step-circle">2</div><div class="step-content"><div class="step-title">Botón "Añadir o crear" → "Archivo" → seleccionad el .zip</div></div></div><div class="step-row"><div class="step-circle">3</div><div class="step-content"><div class="step-title">Haced clic en "Entregar"</div><div class="step-desc">Comprobad que aparece el nombre antes de entregar.</div></div></div></div><div class="highlight-box">Solo un miembro del equipo sube el archivo, pero todos deben tener la versión final.</div><div class="danger-box"><strong>No entreguéis solo el .py.</strong> Sin imagen y sonido el quiz arranca incompleto.</div></div></div>
+  <div class="card"><div class="card-title">Checklist de entrega</div><div class="card-body"><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div>El quiz funciona correctamente en nuestro ordenador</li><li><div class="check" onclick="toggle(this)"></div>La carpeta tiene los 5 archivos</li><li><div class="check" onclick="toggle(this)"></div>El .zip incluye la carpeta completa</li><li><div class="check" onclick="toggle(this)"></div>El nombre del .zip identifica a nuestro equipo</li><li><div class="check" onclick="toggle(this)"></div>Hemos hecho clic en "Entregar" en Classroom</li></ul></div></div>
+</section>
+
+
+<!-- EJEMPLO -->
+<section id="sej">
+  <div class="section-title">🎯 Ejemplo completo de referencia</div>
+  <p class="section-lead">Aquí tenéis un quiz terminado sobre el ODS 12 — Producción y Consumo Responsable. Sirve como referencia de lo que se puede conseguir aplicando todo lo aprendido. No es la única forma de hacerlo: el vuestro puede ser diferente y mejor.</p>
+
+  <div class="card">
+    <div class="card-title">¿Qué incluye este ejemplo?</div>
+    <div class="card-body">
+      <div class="roles-grid">
+        <div class="role-card"><span class="role-icon">🎨</span><div class="role-name">Diseño visual</div><div class="role-desc">Fondo propio con degradado y hexágonos decorativos. Paleta de colores del ODS 12 (dorado y verde oscuro). Paneles semitransparentes para que el texto se lea bien.</div></div>
+        <div class="role-card"><span class="role-icon">🌍</span><div class="role-name">Contenido ODS</div><div class="role-desc">6 preguntas con datos reales y fuente citada. La última pregunta conecta con el Poniente almeriense (Almería como referente agrícola europeo).</div></div>
+        <div class="role-card"><span class="role-icon">💻</span><div class="role-name">Código</div><div class="role-desc">Pantalla de inicio con botón animado. Barra de progreso. Opciones con color según acierto/error. Pantalla final con mensaje personalizado según la puntuación.</div></div>
+        <div class="role-card"><span class="role-icon">🎬</span><div class="role-name">Multimedia</div><div class="role-desc">Vídeo en bucle en esquina inferior derecha. Logo en esquina superior. Sonidos de acierto y error integrados.</div></div>
+      </div>
+      <div class="warn-box"><strong>Importante:</strong> el logotipo de este ejemplo ha sido generado con código Python — no es un diseño de Tinkercad. El vuestro debe crearse en Tinkercad como indica el proyecto.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Archivos necesarios para ejecutarlo</div>
+    <div class="card-body">
+      <p>Descargad los archivos desde Classroom y colocadlos todos en la misma carpeta que el .py:</p>
+      <div class="folder-diagram">
+        <span class="f-folder">📁 PythonProject/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">quiz_ods12.py</span><span class="f-ok">← código del ejemplo</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo.jpg</span><span class="f-ok">← imagen de fondo</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">logo_ods.png</span><span class="f-ok">← logotipo (generado con código)</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">fondo_ods.mp4</span><span class="f-ok">← vídeo en esquina</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">acierto.wav</span><span class="f-ok">← sonido de acierto</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="f-file">error.wav</span><span class="f-ok">← sonido de error</span>
+      </div>
+      <div class="info-box">Antes de ejecutarlo, instala OpenCV si no lo tienes: en el Terminal de PyCharm escribe <code>pip install opencv-python</code> y pulsa Enter.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Preguntas del ejemplo — ODS 12</div>
+    <div class="card-body">
+      <p style="font-size:0.85rem;color:rgba(240,238,232,0.5);margin-bottom:1rem;">Estas son las 6 preguntas que incluye el quiz de ejemplo, con sus fuentes.</p>
+
+      <div class="question-card">
+        <div class="q-label">Pregunta 1 · Fuente: FAO, 2021</div>
+        <div class="q-text">¿Qué porcentaje de los alimentos producidos en el mundo se desperdicia cada año?</div>
+        <div class="q-options">
+          <div class="q-opt wrong">A. Alrededor del 10%</div>
+          <div class="q-opt wrong">B. Alrededor del 17%</div>
+          <div class="q-opt correct">C. Más del 30%</div>
+          <div class="q-opt wrong">D. Menos del 5%</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-label">Pregunta 2 · Fuente: PNUMA, 2023</div>
+        <div class="q-text">¿Cuántas toneladas de residuos plásticos llegan a los océanos cada año?</div>
+        <div class="q-options">
+          <div class="q-opt wrong">A. 1 millón de toneladas</div>
+          <div class="q-opt correct">B. 8 millones de toneladas</div>
+          <div class="q-opt wrong">C. 50 millones de toneladas</div>
+          <div class="q-opt wrong">D. 500.000 toneladas</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-label">Pregunta 3 · Fuente: Fairtrade International</div>
+        <div class="q-text">¿Qué significa que un producto tenga la etiqueta de "comercio justo"?</div>
+        <div class="q-options">
+          <div class="q-opt wrong">A. Que es más barato que otros</div>
+          <div class="q-opt correct">B. Que garantiza condiciones dignas a quienes lo producen</div>
+          <div class="q-opt wrong">C. Que no tiene impuesto de importación</div>
+          <div class="q-opt wrong">D. Que está fabricado en Europa</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-label">Pregunta 4 · Fuente: Greenpeace, 2022</div>
+        <div class="q-text">¿Cuál de estas acciones reduce más el impacto ambiental del consumo textil?</div>
+        <div class="q-options">
+          <div class="q-opt wrong">A. Comprar ropa de marca reconocida</div>
+          <div class="q-opt wrong">B. Lavar la ropa a alta temperatura</div>
+          <div class="q-opt correct">C. Reutilizar, reparar e intercambiar ropa</div>
+          <div class="q-opt wrong">D. Comprar dos prendas en lugar de una</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-label">Pregunta 5 · Fuente: Parlamento Europeo, 2023</div>
+        <div class="q-text">La "economía circular" consiste en...</div>
+        <div class="q-options">
+          <div class="q-opt wrong">A. Mover dinero entre países en desarrollo</div>
+          <div class="q-opt wrong">B. Producir, usar y tirar en el menor tiempo posible</div>
+          <div class="q-opt correct">C. Mantener los recursos en uso el mayor tiempo posible reduciendo residuos</div>
+          <div class="q-opt wrong">D. Circular mercancías solo dentro de la Unión Europea</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-label">Pregunta 6 · Conexión local · Fuente: Consejería de Agricultura, Junta de Andalucía</div>
+        <div class="q-text">¿Qué provincia española es una de las mayores productoras europeas de frutas y hortalizas, con grandes retos de sostenibilidad en el consumo de agua y plásticos?</div>
+        <div class="q-options">
+          <div class="q-opt wrong">A. Valencia</div>
+          <div class="q-opt correct">B. Almería</div>
+          <div class="q-opt wrong">C. Sevilla</div>
+          <div class="q-opt wrong">D. Murcia</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Lo que vuestro quiz debe tener que este no tiene</div>
+    <div class="card-body">
+      <ul class="checklist">
+        <li><div class="check" onclick="toggle(this)"></div><strong>Logotipo creado en Tinkercad</strong> — el de este ejemplo es generado con código, no diseñado en 3D.</li>
+        <li><div class="check" onclick="toggle(this)"></div><strong>Vuestro propio ODS</strong> — este usa el ODS 12, el vuestro puede ser cualquiera de los 17.</li>
+        <li><div class="check" onclick="toggle(this)"></div><strong>Vuestras propias preguntas</strong> — investigadas y redactadas por vosotros con sus fuentes.</li>
+        <li><div class="check" onclick="toggle(this)"></div><strong>Vuestra propia imagen de fondo</strong> — descargada o creada en Canva, no generada con código.</li>
+        <li><div class="check" onclick="toggle(this)"></div><strong>Vuestra propia paleta de colores</strong> — basada en los colores oficiales de vuestro ODS.</li>
+      </ul>
+      <div class="highlight-box">Este ejemplo es un punto de partida y una referencia de nivel. No lo copiéis: usadlo para entender qué es posible y superadlo con vuestras propias decisiones de diseño.</div>
+    </div>
+  </div>
+</section>
+
+<!-- S9 EVALUACIÓN -->
+<section id="s9">
+  <div class="section-title">⭐ Criterio de evaluación</div>
+  <p class="section-lead">Esto es exactamente lo que se va a valorar y cómo. Leedlo antes de empezar y usadlo como guía durante todo el proyecto.</p>
+  <div class="card"><div class="card-title">Niveles de logro</div><div class="card-body"><p>Todo el proyecto se evalúa a través del <strong style="color:#fff;">criterio de evaluación 1.4</strong>, valorando vuestra capacidad de aplicar de forma combinada los conocimientos de programación en un proyecto con impacto social real.</p><div class="puntuacion-grid"><div class="punt-card pe"><div class="punt-num">9-10</div><div class="punt-lbl">Excelente</div></div><div class="punt-card pn"><div class="punt-num">7-8</div><div class="punt-lbl">Notable</div></div><div class="punt-card pb"><div class="punt-num">6</div><div class="punt-lbl">Bien</div></div><div class="punt-card ps"><div class="punt-num">5</div><div class="punt-lbl">Suficiente</div></div><div class="punt-card pi"><div class="punt-num">4-0</div><div class="punt-lbl">Insuficiente</div></div></div></div></div>
+  <div class="card"><div class="card-title">Rúbrica completa</div><div class="card-body"><p style="font-size:0.85rem;color:rgba(240,238,232,0.45);margin-bottom:0.8rem;">En pantallas pequeñas, desplaza la tabla horizontalmente.</p><div style="overflow-x:auto"><div class="rubrica-wrap"><div class="rubrica-header"><div class="rh-criterio">Dimensión</div><div class="rh-exc">Excelente 9-10</div><div class="rh-not">Notable 7-8</div><div class="rh-bie">Bien 6</div><div class="rh-suf">Suficiente 5</div><div class="rh-ins">Insuficiente 4-0</div></div><div class="rubrica-row"><div class="rc-criterio">💻 Funcionamiento del quiz</div><div class="rc-exc">Funciona sin errores. 5+ preguntas correctas, interacción fluida, sonido en todo momento y puntuación exacta.</div><div class="rc-not">Funciona correctamente con algún detalle menor. El sonido y la interacción funcionan.</div><div class="rc-bie">Funciona con algún fallo puntual. La estructura general es correcta.</div><div class="rc-suf">Arranca y muestra preguntas, pero con errores evidentes en lógica, sonido o puntuación.</div><div class="rc-ins">No arranca, o tiene errores graves que impiden jugarlo.</div></div><div class="rubrica-row"><div class="rc-criterio">🧠 Comprensión del código</div><div class="rc-exc">Identifica y explica el bucle, condicionales, lista de diccionarios y función con sus propias palabras.</div><div class="rc-not">Comprende y explica la mayor parte. Algún elemento con menos precisión.</div><div class="rc-bie">Comprende los bloques principales pero tiene dificultades con partes concretas.</div><div class="rc-suf">Reconoce los elementos pero la explicación es superficial.</div><div class="rc-ins">No demuestra comprender el código más allá de haberlo copiado.</div></div><div class="rubrica-row"><div class="rc-criterio">🌍 Calidad del contenido ODS</div><div class="rc-exc">Preguntas rigurosas con datos verificables, fuentes citadas y conexión con la realidad local.</div><div class="rc-not">Preguntas correctas y claras. Alguna puede mejorar en precisión o distractores.</div><div class="rc-bie">Preguntas comprensibles, aunque algún distractor no es del todo plausible.</div><div class="rc-suf">Preguntas simples o poco rigurosas. Distractores que no funcionan bien.</div><div class="rc-ins">Preguntas incorrectas, confusas o sin relación con el ODS.</div></div><div class="rubrica-row"><div class="rc-criterio">🎨 Diseño visual y multimedia</div><div class="rc-exc">Imagen, logotipo 3D y sonidos coherentes con el ODS. El diseño facilita la lectura y transmite el tema.</div><div class="rc-not">Todos los elementos presentes y funcionales. Buena coherencia visual.</div><div class="rc-bie">Elementos presentes pero la coherencia es parcial o el diseño dificulta algo la lectura.</div><div class="rc-suf">Algún elemento falta o no está integrado. Diseño muy básico.</div><div class="rc-ins">Sin imagen propia, sin logo, sin sonidos. Solo texto sin diseño.</div></div><div class="rubrica-row"><div class="rc-criterio">🤝 Trabajo cooperativo</div><div class="rc-exc">Roles definidos, todos explican su aportación. Colaboración evidente en el resultado.</div><div class="rc-not">Roles funcionan bien. Algún miembro participa algo menos pero el equipo está coordinado.</div><div class="rc-bie">Trabajo distribuido pero no siempre equitativo. Algún rol poco definido.</div><div class="rc-suf">El trabajo recae en uno o dos miembros. El resto no explica bien su aportación.</div><div class="rc-ins">Sin evidencia de trabajo en equipo real.</div></div><div class="rubrica-row"><div class="rc-criterio">🎤 Presentación oral</div><div class="rc-exc">Exposición clara, estructurada y fluida. Justifican el diseño, explican el código y reflexionan sobre el proceso.</div><div class="rc-not">Exposición clara y completa. Algún aspecto menos desarrollado.</div><div class="rc-bie">Cubre los puntos principales pero con poca elaboración en la justificación.</div><div class="rc-suf">Presentación breve o incompleta. Muestran el quiz pero la explicación es superficial.</div><div class="rc-ins">Sin presentación, o tan incompleta que no permite valorar el proyecto.</div></div></div></div></div></div>
+  <div class="card"><div class="card-title">Autoevaluación y coevaluación</div><div class="card-body"><p>Al terminar el proyecto completaréis dos valoraciones con carácter orientador.</p><div class="cotejo-grid"><div class="cotejo-box"><div class="cotejo-title">✍️ Autoevaluación individual</div><div class="cotejo-sub">Valora tu propia aportación marcando lo que has cumplido:</div><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div>He cumplido con las tareas de mi rol</li><li><div class="check" onclick="toggle(this)"></div>He participado en las decisiones del equipo</li><li><div class="check" onclick="toggle(this)"></div>He contribuido en la programación o el diseño</li><li><div class="check" onclick="toggle(this)"></div>He aprendido cosas nuevas sobre el ODS</li><li><div class="check" onclick="toggle(this)"></div>He entendido cómo funciona la plantilla de código</li><li><div class="check" onclick="toggle(this)"></div>He respetado los ritmos y aportaciones del equipo</li><li><div class="check" onclick="toggle(this)"></div>Podría explicar qué hace cada parte del programa</li></ul></div><div class="cotejo-box"><div class="cotejo-title">👥 Coevaluación — quiz del otro equipo</div><div class="cotejo-sub">Jugad al quiz de otro equipo y marcad lo que se cumple:</div><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div>Las preguntas son claras y bien formuladas</li><li><div class="check" onclick="toggle(this)"></div>Los distractores son plausibles</li><li><div class="check" onclick="toggle(this)"></div>El quiz funciona sin errores</li><li><div class="check" onclick="toggle(this)"></div>Los sonidos funcionan y son adecuados</li><li><div class="check" onclick="toggle(this)"></div>La imagen y el logotipo son coherentes con el ODS</li><li><div class="check" onclick="toggle(this)"></div>El texto se lee con claridad sobre el fondo</li><li><div class="check" onclick="toggle(this)"></div>Hemos aprendido algo nuevo sobre su ODS</li></ul></div></div><div class="highlight-box">La autoevaluación y la coevaluación no sustituyen a la nota, pero forman parte del proceso de aprendizaje y se tendrán en cuenta.</div></div></div>
+</section>
+
+<!-- S10 -->
+<section id="s10">
+  <div class="section-title">🎮 Presentación final</div>
+  <p class="section-lead">Demostráis el quiz en vivo, explicáis el ODS y justificáis vuestras decisiones de diseño.</p>
+  <div class="card"><div class="card-title">Estructura (5-7 minutos)</div><div class="card-body"><ul class="checklist"><li><div class="check" onclick="toggle(this)"></div><strong>1. Introducción al ODS (1-2 min):</strong> por qué lo elegisteis y qué datos os parecieron más impactantes.</li><li><div class="check" onclick="toggle(this)"></div><strong>2. Demo en vivo (2-3 min):</strong> ejecutad el quiz, que alguien del público juegue.</li><li><div class="check" onclick="toggle(this)"></div><strong>3. Justificación del diseño (1-2 min):</strong> ¿por qué esos colores?, ¿qué fue lo más difícil de programar?</li><li><div class="check" onclick="toggle(this)"></div><strong>4. Reflexión cooperativa (1 min):</strong> ¿cómo fue el trabajo en equipo?, ¿qué cambiaríais?</li></ul></div></div>
+  <div class="highlight-box" style="margin-top:1rem;"><strong>Recordad:</strong> No evaluamos solo si el código funciona. Evaluamos el proceso, el contenido, el diseño, el trabajo en equipo y la capacidad de explicar lo que habéis creado.</div>
+</section>
+
+</div>
+<script>
+function show(id,btn){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function switchTab(btn,id){
+  const par=btn.closest('.card,section');
+  par.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  par.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function switchOs(btn,id){
+  btn.closest('.card-body').querySelectorAll('.os-tab').forEach(t=>t.classList.remove('active'));
+  btn.closest('.card-body').querySelectorAll('.os-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function toggle(el){
+  el.classList.toggle('done');
+  el.textContent=el.classList.contains('done')?'✓':'';
+}
+const odsData=[
+  {n:'1',lbl:'Fin de la pobreza',color:'#e5243b',desc:'Erradicar la pobreza en todas sus formas. Cerca de 574 millones de personas seguirán viviendo con menos de 2,15 dólares al día en 2030 si no actuamos.'},
+  {n:'2',lbl:'Hambre cero',color:'#dda63a',desc:'Poner fin al hambre, lograr la seguridad alimentaria y promover la agricultura sostenible.'},
+  {n:'3',lbl:'Salud y bienestar',color:'#4c9f38',desc:'Garantizar una vida sana y promover el bienestar para todos en todas las edades.'},
+  {n:'4',lbl:'Educación de calidad',color:'#c5192d',desc:'Garantizar una educación inclusiva, equitativa y de calidad y oportunidades de aprendizaje durante toda la vida.'},
+  {n:'5',lbl:'Igualdad de género',color:'#ff3a21',desc:'Lograr la igualdad entre los géneros y empoderar a todas las mujeres y niñas.'},
+  {n:'6',lbl:'Agua limpia',color:'#26bde2',desc:'Garantizar la disponibilidad de agua y su gestión sostenible y el saneamiento para todos.'},
+  {n:'7',lbl:'Energía asequible',color:'#fcc30b',desc:'Garantizar el acceso a una energía asequible, segura, sostenible y moderna.'},
+  {n:'8',lbl:'Trabajo decente',color:'#a21942',desc:'Promover el crecimiento económico inclusivo, el empleo y el trabajo decente para todos.'},
+  {n:'9',lbl:'Industria e innovación',color:'#fd6925',desc:'Construir infraestructuras resilientes y fomentar la innovación inclusiva.'},
+  {n:'10',lbl:'Reducción desigualdades',color:'#dd1367',desc:'Reducir la desigualdad en y entre los países. El 1% más rico acumula más riqueza que el 99% restante.'},
+  {n:'11',lbl:'Ciudades sostenibles',color:'#fd9d24',desc:'Lograr que las ciudades sean inclusivas, seguras, resilientes y sostenibles.'},
+  {n:'12',lbl:'Producción responsable',color:'#bf8b2e',desc:'Garantizar modalidades de consumo y producción sostenibles. Cada año se desperdician 1.300 millones de toneladas de alimentos.'},
+  {n:'13',lbl:'Acción por el clima',color:'#3f7e44',desc:'Adoptar medidas urgentes para combatir el cambio climático y sus efectos.'},
+  {n:'14',lbl:'Vida submarina',color:'#0a97d9',desc:'Conservar y utilizar de forma sostenible los océanos y los recursos marinos.'},
+  {n:'15',lbl:'Vida de ecosistemas',color:'#56c02b',desc:'Gestionar sosteniblemente los bosques y detener la pérdida de biodiversidad.'},
+  {n:'16',lbl:'Paz y justicia',color:'#00689d',desc:'Promover sociedades pacíficas e inclusivas y facilitar el acceso a la justicia para todos.'},
+  {n:'17',lbl:'Alianzas para los ODS',color:'#19486a',desc:'Fortalecer los medios de implementación y revitalizar la Alianza Mundial para el Desarrollo Sostenible.'},
+];
+const grid=document.getElementById('odsGrid');
+odsData.forEach(o=>{
+  const c=document.createElement('div');
+  c.className='ods-card';
+  c.style.background=o.color+'22';
+  c.style.border='1px solid '+o.color+'55';
+  c.innerHTML='<span class="ods-num" style="color:'+o.color+'">'+o.n+'</span><span class="ods-lbl" style="color:'+o.color+'">'+o.lbl+'</span>';
+  c.onclick=function(){
+    document.getElementById('odsDTitle').textContent='ODS '+o.n+': '+o.lbl;
+    document.getElementById('odsDTitle').style.color=o.color;
+    document.getElementById('odsDBody').textContent=o.desc;
+    var d=document.getElementById('odsDetail');
+    d.style.display='block';
+    d.style.borderColor=o.color+'44';
+    d.scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
+  grid.appendChild(c);
+});
+</script>
+</body>
+</html>
